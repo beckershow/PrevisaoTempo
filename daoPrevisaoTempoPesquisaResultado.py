@@ -1,11 +1,38 @@
+import json
+
 from daoConexaoPostgreSQL import Conexao
 from modelPrevisaoTempoPesquisaResultado import ModelPrevisaoTempoPesquisaResultado
-
+import functools
+import logging
 class DaoPrevisaoTempoResultado:
 
 
     def __init__(self):
         self=self
+
+    def retornar_consulta_pesquisa(self):
+        conn = Conexao()
+        conn.conectar()
+        if conn != None:
+            #prs.data_horaprevisao,
+            sql = """select 
+                	   to_char(p.data_horapesquisa, 'dd/mm/yyyy HH:MM:SS') data_horapesquisa,   
+                	   p.cidade, p.pais, to_char(prs.data_horaprevisao, 'dd/mm/yyyy HH:MM:SS') data_horaprevisao,  
+                	   prs.temp, prs.weather_desc
+                	  from previsaotempopesquisa p
+                	  inner join previsaotempopesquisaresultado prs ON prs.id_pesquisatempoprevisao = p.id
+                	  order by data_horapesquisa desc
+                	  limit 50 """
+            try:
+                cursor = conn.consultar(sql)
+
+                items = [dict(zip([key[0] for key in cursor.description], row)) for row in cursor]
+
+                # adicionar novo nested no json
+                return json.dumps({'items': items})
+            finally:
+                conn.fechar()
+
 
     def InserirConsulta(self, modelprevconsulta):
         conn = Conexao()

@@ -3,48 +3,56 @@ from modelPrevisaoTempoPesquisaResultado import ModelPrevisaoTempoPesquisaResult
 from controllerPrevisaoPesquisa import ControllerPrevisaoPesquisa
 from modelPrevisaoTempoPesquisa import ModelPrevisaoTempoPesquisa
 import json
+from datetime import datetime
 
 
 class ControllerConsumirApiPrevisaoTempo:
 
     def __init__(self):
         self = self
-        last_idpesquisa = -1
+        self.last_idpesquisa = -1
 
     # rotina que busca a previsão do tempo dos ultimos 5 dias em 3 em 3 horas de uma determidade cidade e pais;
     def consultar_previsaotempo(self, cidade, pais):
         serviceApi = ServiceConsumirApiPrevisaoTempo()
         jsonretorno = serviceApi.consultar_previsaotempo(cidade, pais)
 
-        if jsonretorno["cod"] != "404":
-            # se deu tudo certo, vamos gravar o histórico de pesquisa
-            # ao gravar historico de pesquisa, vamos retornar o id, e repassar pra chave estrangeira
-            self.gravar_historico_pesquisa(cidade, pais)
+        try:
+            if jsonretorno["cod"] != "404":
+                # se deu tudo certo, vamos gravar o histórico de pesquisa
+                # ao gravar historico de pesquisa, vamos retornar o id, e repassar pra chave estrangeira
+                self.gravar_historico_pesquisa(cidade, pais)
 
-            # Após gravar o histórico de pesquisa, vamos pegar o json de consulta e manipular os dados
-            list_resultado = self.obter_info_json(jsonretorno, cidade, pais, self.last_idpesquisa)
+                # Após gravar o histórico de pesquisa, vamos pegar o json de consulta e manipular os dados
+                list_resultado = self.obter_info_json(jsonretorno, cidade, pais, self.last_idpesquisa)
 
-            # Após obter todos os resultados, vamos gravar no banco as informações do tempo consultada
-            self.gravar_resultado_pesquisa(list_resultado)
+                # Após obter todos os resultados, vamos gravar no banco as informações do tempo consultada
+                self.gravar_resultado_pesquisa(list_resultado)
 
-            # montar json de devolução
-            modelPesjson = ModelPrevisaoTempoPesquisa()
-            modelPesjson.id = self.last_idpesquisa
-            modelPesjson.cidade = cidade
-            modelPesjson.pais = pais
-            modelPesjson.longitude = 0
-            modelPesjson.latitude = 0
+                # montar json de devolução
+                modelPesjson = ModelPrevisaoTempoPesquisa()
+                modelPesjson.id = self.last_idpesquisa
+                modelPesjson.cidade = cidade
+                modelPesjson.pais = pais
+                modelPesjson.longitude = 0
+                modelPesjson.latitude = 0
 
-            self.montar_json_retorno_sucesso(modelPesjson, list_resultado)
+                return self.montar_json_retorno_sucesso(modelPesjson, list_resultado)
+            else:
+                return self.montar_json_retorno_erro("Cidade não encontrada")
+        except Exception as err:
+            return self.montar_json_retorno_erro(str(err))
+
 
 
 
     def obter_info_json(self, json_consulta, cidade, pais, id_pesquisa):
         list_resultados = []
         for list_dateshours in json_consulta["list"]:
-            model_result = ModelPrevisaoTempoPesquisaResultado() #shift f6 , snake case
+            model_result = ModelPrevisaoTempoPesquisaResultado()
 
             # informacos do nodo principal
+            #model_result.data_horaprevisao = datetime.strptime(list_dateshours["dt_txt"], '%Y-%m-%d %H:%M:%S')
             model_result.data_horaprevisao = list_dateshours["dt_txt"]
 
             # informacoes do nodo mais segundo nivel
@@ -115,8 +123,17 @@ class ControllerConsumirApiPrevisaoTempo:
         dict_model_pes["resultados"] = [res.__dict__ for res in lista_resultado]
 
         #converter para json
-        jsonfinal = json.dumps(dict_model_pes, indent=4)
-
-
+        jsonfinal = json.dumps(dict_model_pes,
+                               indent=4,
+                               skipkeys = True,
+                               allow_nan = True,
+                               ensure_ascii=False)
         print(jsonfinal)
-        #print(jsonLoad)
+        return jsonfinal
+
+    def montar_json_retorno_erro(self, erro):
+        return {"success": "False", "erro": erro}
+
+    def consultar_historico_pesquisa(self):
+        controllerResultado = ControllerPrevisaoPesquisa()
+        return controllerResultado.consulta_pesquisa_previsao()

@@ -11,7 +11,7 @@ class ServiceConsumirApiPrevisaoTempo:
 
     def consultar_previsaotempo(self, cidade, pais):
         # url de consulta, 5 dias de 3 em 3 horas, a unica que foi encontrado
-        base_url = "http://api.openweathermap.org/data/2.5/forecast?lang=pt_br&units=metric&"
+        base_url = "http://api.openweathermap.org/data/2.5/forecast?lang=pt_br&units=metric&cnt=2&"
 
         # Cidade
         city_name = cidade

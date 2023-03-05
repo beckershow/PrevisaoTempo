@@ -1,0 +1,109 @@
+-- Database: previsaotempo
+
+-- DROP DATABASE previsaotempo;
+
+CREATE DATABASE previsaotempo
+  WITH OWNER = postgres
+       ENCODING = 'UTF8'
+       TABLESPACE = pg_default
+       LC_COLLATE = 'Portuguese_Brazil.1252'
+       LC_CTYPE = 'Portuguese_Brazil.1252'
+       CONNECTION LIMIT = -1;
+
+
+
+
+-- Sequence: public.previsaoresultado_id_seq
+
+-- DROP SEQUENCE public.previsaoresultado_id_seq;
+
+CREATE SEQUENCE public.previsaoresultado_id_seq
+  INCREMENT 1
+  MINVALUE 1
+  MAXVALUE 9223372036854775807
+  START 2845
+  CACHE 1;
+ALTER TABLE public.previsaoresultado_id_seq
+  OWNER TO postgres;
+
+
+-- Sequence: public.previsaotempopesquisa_id_seq
+
+-- DROP SEQUENCE public.previsaotempopesquisa_id_seq;
+
+CREATE SEQUENCE public.previsaotempopesquisa_id_seq
+  INCREMENT 1
+  MINVALUE 1
+  MAXVALUE 9223372036854775807
+  START 111
+  CACHE 1;
+ALTER TABLE public.previsaotempopesquisa_id_seq
+  OWNER TO postgres;
+
+
+-- Table: public.previsaotempopesquisa
+
+-- DROP TABLE public.previsaotempopesquisa;
+
+CREATE TABLE public.previsaotempopesquisa
+(
+  id integer NOT NULL DEFAULT nextval('previsaotempopesquisa_id_seq'::regclass),
+  cidade character varying(100) NOT NULL,
+  pais character varying(100) NOT NULL,
+  longitude real NOT NULL,
+  latitudade real NOT NULL,
+  data_horapesquisa timestamp without time zone,
+  CONSTRAINT previsaotempopesquisa_pkey PRIMARY KEY (id)
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.previsaotempopesquisa
+  OWNER TO postgres;
+
+
+-- Table: public.previsaotempopesquisaresultado
+
+-- DROP TABLE public.previsaotempopesquisaresultado;
+
+CREATE TABLE public.previsaotempopesquisaresultado
+(
+  id integer NOT NULL DEFAULT nextval('previsaoresultado_id_seq'::regclass),
+  temp real NOT NULL,
+  feels_like real NOT NULL,
+  temp_min real NOT NULL,
+  temp_max real NOT NULL,
+  pressure integer,
+  sea_level integer,
+  grn_level integer,
+  humidity integer,
+  temp_kf real,
+  weather_desc character varying(100) NOT NULL,
+  clouds_all integer,
+  wind_speed real,
+  wind_deg integer,
+  wind_gust real,
+  rain_3h real,
+  sys_pod character(1) DEFAULT NULL::bpchar,
+  id_pesquisatempoprevisao integer,
+   data_horaprevisao timestamp without time zone,
+  CONSTRAINT previsaoresultado_pkey PRIMARY KEY (id),
+  CONSTRAINT fk_previsaotempopesquisa FOREIGN KEY (id_pesquisatempoprevisao)
+      REFERENCES public.previsaotempopesquisa (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.previsaotempopesquisaresultado
+  OWNER TO postgres;
+
+-- Index: public.fki_previsaotempopesquisa
+
+-- DROP INDEX public.fki_previsaotempopesquisa;
+
+CREATE INDEX fki_previsaotempopesquisa
+  ON public.previsaotempopesquisaresultado
+  USING btree
+  (id_pesquisatempoprevisao);
+

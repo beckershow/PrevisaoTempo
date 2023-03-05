@@ -3,6 +3,7 @@ from modelPrevisaoTempoPesquisaResultado import ModelPrevisaoTempoPesquisaResult
 from daoPrevisaoTempoPesquisa import DaoPrevisaoTempoPesquisa
 from daoPrevisaoTempoPesquisaResultado import DaoPrevisaoTempoResultado
 from datetime import datetime
+import json
 
 class ControllerPrevisaoPesquisa:
 
@@ -27,7 +28,7 @@ class ControllerPrevisaoPesquisa:
                                   pressure, sea_level, grnd_level, humidity,
                                   temp_kf, weather_desc, clouds_all, wind_speed,
                                   wind_deg, wind_gust, rain_3h, sys_pod, id_pesquisatempoprevisao,
-                                  ):
+                                  data_horaprevisao):
         modelResult = ModelPrevisaoTempoPesquisaResultado()
         modelResult.temp = temp
         modelResult.feel_like = feel_like
@@ -46,7 +47,7 @@ class ControllerPrevisaoPesquisa:
         modelResult.rain_3h = rain_3h
         modelResult.sys_pod = sys_pod
         modelResult.id_pesquisatempoprevisao = id_pesquisatempoprevisao
-        modelResult.data_horaprevisao = datetime.datetime()
+        modelResult.data_horaprevisao = data_horaprevisao
 
         daoPreviResult = DaoPrevisaoTempoResultado()
         daoPreviResult.InserirConsulta(modelResult)
@@ -54,6 +55,13 @@ class ControllerPrevisaoPesquisa:
     def gravar_previsao_resultado_model(self, modelResult):
         daoPreviResult = DaoPrevisaoTempoResultado()
         daoPreviResult.InserirConsulta(modelResult)
+
+    def consulta_pesquisa_previsao(self):
+        daoPreviResult = DaoPrevisaoTempoResultado()
+        jsonReturn = daoPreviResult.retornar_consulta_pesquisa()
+
+        return jsonReturn
+
 
     def gatLastId(self):
         return self.last_id

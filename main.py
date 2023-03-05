@@ -18,4 +18,6 @@ if __name__ == '__main__':
     #serviceApi.consultar_previsaotempo('blumenau', 'br')
 
     controlerApi = ControllerConsumirApiPrevisaoTempo()
-    controlerApi.consultar_previsaotempo('blumenau', 'br');
+    controlerApi.consultar_previsaotempo('blumenau', 'br')
+   # controlerApi.consultar_historico_pesquisa()
+
