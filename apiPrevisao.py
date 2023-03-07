@@ -26,4 +26,4 @@ async def get_historico_pesquisa():
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="192.168.1.52", port=7777)
+    uvicorn.run(app, host="127.0.0.1", port=7777)
