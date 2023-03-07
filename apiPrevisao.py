@@ -24,6 +24,6 @@ async def get_historico_pesquisa():
     controlerApi = ControllerConsumirApiPrevisaoTempo()
     return controlerApi.consultar_historico_pesquisa()
 
-
+# rodar local host
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=7777)
