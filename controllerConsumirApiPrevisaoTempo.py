@@ -3,6 +3,8 @@ from modelPrevisaoTempoPesquisaResultado import ModelPrevisaoTempoPesquisaResult
 from controllerPrevisaoPesquisa import ControllerPrevisaoPesquisa
 from modelPrevisaoTempoPesquisa import ModelPrevisaoTempoPesquisa
 import json
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
 from datetime import datetime
 
 
@@ -123,13 +125,13 @@ class ControllerConsumirApiPrevisaoTempo:
         dict_model_pes["resultados"] = [res.__dict__ for res in lista_resultado]
 
         #converter para json
-        jsonfinal = json.dumps(dict_model_pes,
-                               indent=4,
-                               skipkeys = True,
-                               allow_nan = True,
-                               ensure_ascii=False)
-        print(jsonfinal)
-        return jsonfinal
+        jsonfinal = json.dumps(dict_model_pes, separators=None, ensure_ascii=False)
+
+        b = json.loads(jsonfinal)
+
+        return b
+
+
 
     def montar_json_retorno_erro(self, erro):
         return {"success": "False", "erro": erro}

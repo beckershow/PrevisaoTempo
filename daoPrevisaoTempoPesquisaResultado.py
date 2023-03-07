@@ -29,7 +29,10 @@ class DaoPrevisaoTempoResultado:
                 items = [dict(zip([key[0] for key in cursor.description], row)) for row in cursor]
 
                 # adicionar novo nested no json
-                return json.dumps({'items': items})
+                json_resultstr = json.dumps({'items': items})
+                return json.loads(json_resultstr)
+
+
             finally:
                 conn.fechar()
 
